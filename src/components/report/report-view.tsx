@@ -33,7 +33,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FileDown, Trash2, Pencil, Search, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { Card, CardContent } from '../ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
 
 export function ReportView() {
   const { activeStore, getReportData, updateInventoryItem, deleteInventoryItem } = useInventory();
@@ -113,8 +113,69 @@ export function ReportView() {
           Exportar Excel
         </Button>
       </div>
+      
+      {/* Mobile View */}
+      <div className="md:hidden space-y-3">
+        {filteredData.length > 0 ? (
+          filteredData.map((item) => (
+            <Card key={item.ean}>
+              <CardHeader className="p-4">
+                <CardTitle className="text-base">{item.description}</CardTitle>
+                <p className="text-xs text-muted-foreground">{item.ean}</p>
+              </CardHeader>
+              <CardContent className="p-4 grid grid-cols-3 gap-2 text-center">
+                <div>
+                    <p className="text-xs text-muted-foreground">Bodega</p>
+                    <p className="font-bold">{item.bodega}</p>
+                </div>
+                 <div>
+                    <p className="text-xs text-muted-foreground">Mueble</p>
+                    <p className="font-bold">{item.mueble}</p>
+                </div>
+                 <div>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                    <p className="font-bold">{item.total}</p>
+                </div>
+              </CardContent>
+              <CardFooter className="p-2 flex justify-end gap-1">
+                <Button variant="ghost" size="icon" onClick={() => startEditing(item)}>
+                    <Pencil className="h-4 w-4" />
+                </Button>
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                        Esta acción no se puede deshacer. Se eliminará permanentemente el artículo "{item.description}" del inventario.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteInventoryItem(item.ean)}>
+                        Eliminar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+              </CardFooter>
+            </Card>
+          ))
+        ) : (
+             <Card>
+                <CardContent className="h-24 flex items-center justify-center">
+                    <p className="text-muted-foreground">No se encontraron resultados.</p>
+                </CardContent>
+             </Card>
+        )}
+      </div>
 
-      <Card>
+      {/* Desktop View */}
+      <Card className="hidden md:block">
         <ScrollArea className="h-[calc(100vh-20rem)]">
           <Table>
             <TableHeader className="sticky top-0 bg-background">
@@ -203,3 +264,5 @@ export function ReportView() {
     </div>
   );
 }
+
+    
